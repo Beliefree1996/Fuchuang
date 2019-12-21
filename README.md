@@ -1,0 +1,1 @@
+´ò°üÃüÁî£ºpyinstaller --icon=tubiao\MD5.ico --onefile -w MY_GUI.py

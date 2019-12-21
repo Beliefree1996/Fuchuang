@@ -1,4 +1,6 @@
 from tkinter import *
+import tkinter.filedialog
+import docx
 import hashlib
 import time
 
@@ -15,25 +17,77 @@ class MY_GUI():
         # self.init_window_name.geometry('320x160+10+10')                         #290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
         self.init_window_name.geometry('1068x681+10+10')
         # self.init_window_name["bg"] = "pink"85
-        # #窗口背景色，其他背景色见：blog.csdn.net/chl0000/article/details/7657887 self.init_window_name.attributes("-alpha",
-        # 0.9)                          #虚化，值越小虚化程度越高 标签
-        self.init_data_label = Label(self.init_window_name, text="待处理数据")
+        # #窗口背景色，其他背景色见：blog.csdn.net/chl0000/article/details/7657887
+        # self.init_window_name.attributes("-alpha", 0.9)                          #虚化，值越小虚化程度越高 标签
+        # 标签
+        self.init_data_label = Label(self.init_window_name, text="待处理数据", font="12")
         self.init_data_label.grid(row=0, column=0)
-        self.result_data_label = Label(self.init_window_name, text="输出结果")
+        self.result_data_label = Label(self.init_window_name, text="输出结果", font="12")
         self.result_data_label.grid(row=0, column=12)
-        self.log_label = Label(self.init_window_name, text="日志")
-        self.log_label.grid(row=12, column=0)
+        self.log_label = Label(self.init_window_name,
+                               text="日志", font="12")
+        self.log_label.grid(row=12, column=12)
         # 文本框
-        self.init_data_Text = Text(self.init_window_name, width=67, height=35)  # 原始数据录入框
-        self.init_data_Text.grid(row=1, column=0, rowspan=10, columnspan=10)
-        self.result_data_Text = Text(self.init_window_name, width=70, height=49)  # 处理结果展示
-        self.result_data_Text.grid(row=1, column=12, rowspan=15, columnspan=10)
-        self.log_data_Text = Text(self.init_window_name, width=66, height=9)  # 日志框
-        self.log_data_Text.grid(row=13, column=0, columnspan=10)
-        # 按钮
+        self.init_data_Text = Text(self.init_window_name, width=70, height=49)  # 原始数据录入框
+        self.init_data_Text.grid(row=1, column=0, rowspan=15, columnspan=10)
+        self.result_data_Text = Text(self.init_window_name, width=60, height=35)  # 处理结果展示
+        self.result_data_Text.grid(row=1, column=12, rowspan=10, columnspan=10)
+        self.log_data_Text = Text(self.init_window_name, width=60, height=9)  # 日志框
+        self.log_data_Text.grid(row=13, column=12, rowspan=5, columnspan=10)
+        # 选择文件按钮
+        self.load_text_button = Button(self.init_window_name, text="选择文件", bg="lightblue", width=10,
+                                       command=self.load_text)
+        self.load_text_button.grid(row=1, column=11)
+        # self.load_text_button.pack(expand=10)
+        # 转换按钮
         self.str_trans_to_md5_button = Button(self.init_window_name, text="字符串转MD5", bg="lightblue", width=10,
                                               command=self.str_trans_to_md5)  # 调用内部方法  加()为直接调用
-        self.str_trans_to_md5_button.grid(row=1, column=11)
+        self.str_trans_to_md5_button.grid(row=3, column=11)
+        # 清空按钮
+        self.clear_button = Button(self.init_window_name, text='清空', bg='red', width=8,
+                                   command=self.text_delete)
+        self.clear_button.grid(row=5, column=11)
+
+    # 读取文件
+    def load_text(self):
+        filenames = tkinter.filedialog.askopenfilenames()
+        string_filename = ''
+        if len(filenames) != 0:
+            self.init_data_Text.delete(1.0, END)
+            for i in range(0, len(filenames)):
+                string_filename += str(filenames[i])
+            print(string_filename)
+            point_place = string_filename.find('.')
+            print(string_filename[point_place+1:])
+            file_format = string_filename[point_place+1:]   # 文件格式
+            if file_format == 'txt':
+                file_object = open(string_filename, 'r')
+                try:
+                    textrow = 1.0
+                    for line in file_object:
+                        # line = line.strip('\n')
+                        self.init_data_Text.insert(textrow, line)
+                        textrow += textrow + 1
+                finally:
+                    file_object.close()
+                    self.write_log_to_Text("INFO: Reading file succeeded")
+            elif file_format == 'docx':
+                file_object = docx.Document(string_filename)
+                textrow = 1.0
+                for paragraph in file_object.paragraphs:
+                    self.init_data_Text.insert(textrow, paragraph.text+'\n')
+                    textrow += textrow + 1
+                self.write_log_to_Text("INFO: Reading file succeeded")
+            else:
+                self.write_log_to_Text("INFO: Does not support reading this type of file")
+        else:
+            print("您没有选择任何文件！")
+            self.write_log_to_Text("INFO: You have not selected any files")
+
+    # 清空输入框
+    def text_delete(self):
+        self.init_data_Text.delete(1.0, END)
+        self.write_log_to_Text("INFO: Clear input box data")
 
     # 功能函数
     def str_trans_to_md5(self):
@@ -48,12 +102,12 @@ class MY_GUI():
                 # 输出到界面
                 self.result_data_Text.delete(1.0, END)
                 self.result_data_Text.insert(1.0, myMd5_Digest)
-                self.write_log_to_Text("INFO:str_trans_to_md5 success")
+                self.write_log_to_Text("INFO: String to MD5 success")
             except:
                 self.result_data_Text.delete(1.0, END)
                 self.result_data_Text.insert(1.0, "字符串转MD5失败")
         else:
-            self.write_log_to_Text("ERROR:str_trans_to_md5 failed")
+            self.write_log_to_Text("ERROR: String to MD5 failed")
 
     # 获取当前时间
     def get_current_time(self):
