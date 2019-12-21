@@ -14,26 +14,26 @@ class MY_GUI():
     # 设置窗口
     def set_init_window(self):
         self.init_window_name.title("MD5转换器")  # 窗口名
-        # self.init_window_name.geometry('320x160+10+10')                         #290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
-        self.init_window_name.geometry('1068x681+10+10')
+        self.init_window_name.geometry('1080x680+10+10')                         #1080x680为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
+        self.init_window_name.resizable(width=False, height=False)                    # 设置窗口是否可以变化高和宽
         # self.init_window_name["bg"] = "pink"85
         # #窗口背景色，其他背景色见：blog.csdn.net/chl0000/article/details/7657887
         # self.init_window_name.attributes("-alpha", 0.9)                          #虚化，值越小虚化程度越高 标签
         # 标签
         self.init_data_label = Label(self.init_window_name, text="待处理数据", font="12")
-        self.init_data_label.grid(row=0, column=0)
+        self.init_data_label.grid(row=0, column=0, padx=20, sticky=W)
         self.result_data_label = Label(self.init_window_name, text="输出结果", font="12")
-        self.result_data_label.grid(row=0, column=12)
+        self.result_data_label.grid(row=0, column=12, padx=20, sticky=W)
         self.log_label = Label(self.init_window_name,
                                text="日志", font="12")
-        self.log_label.grid(row=12, column=12)
+        self.log_label.grid(row=12, column=12, padx=20, sticky=W)
         # 文本框
         self.init_data_Text = Text(self.init_window_name, width=70, height=49)  # 原始数据录入框
-        self.init_data_Text.grid(row=1, column=0, rowspan=15, columnspan=10)
+        self.init_data_Text.grid(row=1, column=0, rowspan=15, columnspan=10, padx=20, pady=5)
         self.result_data_Text = Text(self.init_window_name, width=60, height=35)  # 处理结果展示
-        self.result_data_Text.grid(row=1, column=12, rowspan=10, columnspan=10)
+        self.result_data_Text.grid(row=1, column=12, rowspan=6, columnspan=10, padx=20, pady=5)
         self.log_data_Text = Text(self.init_window_name, width=60, height=9)  # 日志框
-        self.log_data_Text.grid(row=13, column=12, rowspan=5, columnspan=10)
+        self.log_data_Text.grid(row=13, column=12, rowspan=3, columnspan=10, padx=20, pady=5)
         # 选择文件按钮
         self.load_text_button = Button(self.init_window_name, text="选择文件", bg="lightblue", width=10,
                                        command=self.load_text)
@@ -60,7 +60,7 @@ class MY_GUI():
             point_place = string_filename.find('.')
             print(string_filename[point_place+1:])
             file_format = string_filename[point_place+1:]   # 文件格式
-            if file_format == 'txt':
+            if file_format == 'txt':    # TXT文件
                 file_object = open(string_filename, 'r')
                 try:
                     textrow = 1.0
@@ -71,7 +71,7 @@ class MY_GUI():
                 finally:
                     file_object.close()
                     self.write_log_to_Text("INFO: Reading file succeeded")
-            elif file_format == 'docx':
+            elif file_format == 'docx':     # DOCX文件
                 file_object = docx.Document(string_filename)
                 textrow = 1.0
                 for paragraph in file_object.paragraphs:
